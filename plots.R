@@ -457,10 +457,10 @@ titv = titv(maf = maf,
 plotTiTv(res = titv)
 getSampleSummary(maf) %>% head
 
-lollipopPlot(maf, "PTEN", labelPos = 'all')
+lollipopPlot(maf, "PTEN")
 lollipopPlot(maf, "TP53", labelPos = 'all')
-lollipopPlot(maf, "TTN", labelPos = 'all')
-lollipopPlot(maf, "EGFR", labelPos = 'all')
+lollipopPlot(maf, "TTN")
+lollipopPlot(maf, "EGFR")
 
 #good graph!!!!!
 somaticInteractions(maf, top = 10, pvalue = c(0.01, 0.05))
@@ -686,11 +686,11 @@ ht_egfr_ethno
 clin.gbm <- GDCquery_clinic("TCGA-GBM", "clinical")
 TCGAanalyze_survival(clin.gbm,
                      "gender",
-                     main = "TCGA Set\n GBM",height = 10, width=10)
+                     main = "TCGA Set\n GBM",height = 10, width=10, filename = 'gen_sur.png')
 
 TCGAanalyze_survival(clin.gbm,
                      "race",
-                     main = "TCGA Set\n GBM",height = 10, width=10, file = 'race_surv.pdf')
+                     main = "TCGA Set\n GBM",height = 10, width=10, file = 'race_surv.png')
 
 
 ##################PCA
@@ -716,12 +716,60 @@ pca <- TCGAvisualize_PCA(dataFilt,dataDEGsFiltLevel, ntopgenes = 200, group1, gr
 
 
 
+################33graphs
+
+ht_egfr_ethno
+ht_egfr_gen
+ht_egfr_race
+
+ht_pten
+ht_pten_ethno
+ht_pten_gen
+ht_pten_race
+
+ht_tp53
+ht_tp53_ethno
+ht_tp53_race
+ht_tp53_gen
+
+ht_ttn
+ht_ttn_ethno
+ht_ttn_gen
+ht_ttn_race
 
 
 
+#####lena part
+library('biomaRt')
+##AGAIN
 
+ensembl_ids <- 
+  rownames(normalized_counts) %>%
+  str_remove("\\.[0-9]*")
 
+mart <- 
+  biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
 
+ensembl_to_hgnc <-
+  biomaRt::getBM(attributes = c('ensembl_gene_id', 'hgnc_symbol'), 
+                 mart = mart) %>%
+  filter(ensembl_gene_id %in% ensembl_ids) %>%
+  group_by(ensembl_gene_id) %>%
+  summarise(hgnc_symbol = paste(unique(hgnc_symbol)[unique(hgnc_symbol) != ""],
+                                collapse = ",")) %>%
+  mutate(hgnc_symbol = ifelse(hgnc_symbol == "", 
+                              ensembl_gene_id,
+                              hgnc_symbol)) %>%
+  column_to_rownames("ensembl_gene_id") 
+
+rownames(normalized_counts) <-
+  ensembl_to_hgnc[ensembl_ids,]t
+top15_counts <- normalized_counts[match(top_15, rownames(normalized_counts)), ]
+Heatmap(top15_counts,
+        show_row_names = T, show_column_names = FALSE,
+        clustering_distance_rows = "pearson", name = "gene expression",
+        col = viridis::viridis(100), 
+        top_annotation = ha, bottom_annotation = ha_bottom)
 
 
 
