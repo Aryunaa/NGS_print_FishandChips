@@ -1,6 +1,11 @@
 # NGS_print_FishandChips
 
 We want to tell you a story about GBM from TCGA data using data visualization
+OUR PRESENTATION: https://docs.google.com/presentation/d/1Wu2_EOPQwDH3i7LD-27vQ2RY6tBr75yFFOU-C_LWU9U/edit#slide=id.gec0970bb19_4_5
+
+
+
+TUTORIALS:
 
 https://github.com/kzkedzierska/NGSprint_data_viz
 
